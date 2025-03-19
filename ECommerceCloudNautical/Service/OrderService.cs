@@ -44,8 +44,8 @@ namespace ECommerceCloudNautical.Service
             var orders = orderGroups.Select(orderGroup => new Order
             {
                 OrderNumber = orderGroup.Key,
-                OrderDate = orderGroup.First().OrderDate,
-                DeliveryExpected = orderGroup.First().DeliveryExpected,
+                OrderDate = DateOnly.FromDateTime(orderGroup.First().OrderDate),
+                DeliveryExpected = DateOnly.FromDateTime(orderGroup.First().DeliveryExpected),
                 DeliveryAddress = orderGroup.First().DeliveryAddress,
                 OrderItems = orderGroup.Select(r => new OrderItem
                 {
