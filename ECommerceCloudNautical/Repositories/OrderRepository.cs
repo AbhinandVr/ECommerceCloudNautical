@@ -22,36 +22,36 @@ namespace CloudnaOrderApi.Repositories
         {
             using var connection = new SqlConnection(_connectionString);
 
-            var query = @"SELECT 
-        C.FIRSTNAME, 
-        C.LASTNAME, 
-        C.EMAIL,
-        O.ORDERID, 
-        O.ORDERDATE, 
-        O.DELIVERYEXPECTED, 
-        O.CONTAINSGIFT,
-        C.HOUSENO + ' ' + C.STREET + ', ' + C.TOWN + ', ' + C.POSTCODE AS DELIVERYADDRESS,
-        CASE 
-            WHEN O.CONTAINSGIFT = 1 THEN 'Gift' 
-            ELSE P.PRODUCTNAME 
-        END AS PRODUCTNAME,
-        OI.QUANTITY, 
-        OI.PRICE
-    FROM 
-        CUSTOMERS C
-    LEFT JOIN 
-        ORDERS O ON C.CUSTOMERID = O.CUSTOMERID
-    LEFT JOIN 
-        ORDERITEMS OI ON O.ORDERID = OI.ORDERID
-    LEFT JOIN 
-        PRODUCTS P ON OI.PRODUCTID = P.PRODUCTID
-    WHERE 
-        C.CUSTOMERID = @CustomerId
-    ORDER BY 
-        O.ORDERDATE DESC;";
+            var query = @"
+                SELECT 
+                    C.FIRSTNAME, 
+                    C.LASTNAME, 
+                    C.EMAIL,
+                    O.ORDERID, 
+                    O.ORDERDATE, 
+                    O.DELIVERYEXPECTED, 
+                    O.CONTAINSGIFT,
+                    C.HOUSENO + ' ' + C.STREET + ', ' + C.TOWN + ', ' + C.POSTCODE AS DELIVERYADDRESS,
+                    CASE 
+                        WHEN O.CONTAINSGIFT = 1 THEN 'Gift' 
+                        ELSE P.PRODUCTNAME 
+                    END AS PRODUCTNAME,
+                    OI.QUANTITY, 
+                    OI.PRICE
+                FROM 
+                    CUSTOMERS C
+                LEFT JOIN 
+                    ORDERS O ON C.CUSTOMERID = O.CUSTOMERID
+                LEFT JOIN 
+                    ORDERITEMS OI ON O.ORDERID = OI.ORDERID
+                LEFT JOIN 
+                    PRODUCTS P ON OI.PRODUCTID = P.PRODUCTID
+                WHERE 
+                    C.CUSTOMERID = @CustomerId
+                ORDER BY 
+                    O.ORDERDATE DESC;";
 
             return await connection.QueryAsync<OrderBind>(query, new { Email = email, CustomerId = customerId });
         }
-
     }
 }

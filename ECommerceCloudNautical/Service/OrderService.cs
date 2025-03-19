@@ -32,7 +32,7 @@ namespace ECommerceCloudNautical.Service
                 LastName = orderResponse.LastName
             };
 
-            // Check if there are any valid orders
+            // Check if there are any valid orders guessing the orderid cannot be 0(null)
             var orderGroups = result.Where(r => r.OrderId != 0).GroupBy(r => r.OrderId);
 
             if (!orderGroups.Any())
