@@ -13,11 +13,52 @@ namespace ECommerceCloudNautical.Service
                 _orderRepository = orderRepository;
             }
 
-            public async Task<OrderResponse?> GetLatestOrderAsync(string email, string customerId)
+        public async Task<OrderResponse?> GetLatestOrderAsync(string email, string customerId)
+        {
+            var result = await _orderRepository.GetLatestOrderAsync(email, customerId);
+            var orderResponse = result.FirstOrDefault();
+            if (orderResponse == null)
             {
-                return await _orderRepository.GetLatestOrderAsync(email, customerId);
+                throw new InvalidUserException("The customer does not exist");
             }
+            if (orderResponse?.Email != email)
+            {
+                throw new InvalidUserException("Mail Id provided does not match with the customerid");
+            }
+
+            var customerDetails = new Customer
+            {
+                FirstName = orderResponse.FirstName,
+                LastName = orderResponse.LastName
+            };
+
+            // Check if there are any valid orders
+            var orderGroups = result.Where(r => r.OrderId != 0).GroupBy(r => r.OrderId);
+
+            if (!orderGroups.Any())
+            {
+                // Return empty order list if no valid orders exist
+                return new OrderResponse { Customer = customerDetails, Order = new List<Order>() };
+            }
+
+            var orders = orderGroups.Select(orderGroup => new Order
+            {
+                OrderNumber = orderGroup.Key,
+                OrderDate = orderGroup.First().OrderDate,
+                DeliveryExpected = orderGroup.First().DeliveryExpected,
+                DeliveryAddress = orderGroup.First().DeliveryAddress,
+                OrderItems = orderGroup.Select(r => new OrderItem
+                {
+                    Product = r.ProductName ?? "",
+                    Quantity = r.Quantity,
+                    PriceEach = r.Price
+                }).ToList()
+            }).ToList();
+
+            return new OrderResponse { Customer = customerDetails, Order = orders };
         }
 
-    
+    }
+
+
 }
