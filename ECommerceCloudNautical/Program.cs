@@ -1,4 +1,10 @@
+using CloudnaOrderApi.Repositories;
+using ECommerceCloudNautical.Repositories;
+using ECommerceCloudNautical.Service;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Add services to the container.
 
